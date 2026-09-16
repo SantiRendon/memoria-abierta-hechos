@@ -1,0 +1,17 @@
+# Configuración específica para el hecho: Violencia Sexual
+hecho:
+  id: "violencia_sexual"
+  nombre: "Violencia Sexual en el Marco del Conflicto Armado"
+  descripcion: "Actos de violencia sexual perpetrados por actores del conflicto armado"
+
+archivos:
+  casos_raw: "data/raw/casos_violencia_sexual_raw.csv"
+  victimas_raw: "data/raw/victimas_violencia_sexual_raw.csv"
+  procesado: "data/processed/violencia_sexual_unificada.csv"
+  features: "data/features/features_violencia_sexual.csv"
+  modelo: "modelos/modelo_violencia_sexual_riesgo.joblib"
+
+parametros_features:
+  ventana_lag_anios: [1, 2, 3]
+  umbral_alto_riesgo_victimas: 2
+

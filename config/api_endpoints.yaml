@@ -1,0 +1,33 @@
+# ==============================================================================
+# CONFIGURACIÓN DE ENDPOINTS - DATOS ABIERTOS COLOMBIA (datos.gov.co)
+# Motor: Socrata Open Data API (SODA)
+# ==============================================================================
+
+api_general:
+  base_url: "https://www.datos.gov.co/api/v3/views/"
+  formato: "json"
+  limite_por_pagina: 5000
+  timeout_segundos: 60
+  max_reintentos: 3
+
+# Configuración por cada hecho victimizante
+# Nota: Cada hecho tiene dos datasets independientes: 'casos' (nivel agregado) y 'victimas' (nivel individual)
+hechos:
+  reclutamiento_niños:
+    nombre_oficial: "Reclutamiento y utilización de niños, niñas y adolescentes"
+    casos:
+      dataset_id: "reclutamiento-casos"
+      url_completa: "https://www.datos.gov.co/api/v3/views/hzd2-7ea7/query.json"
+    victimas:
+      dataset_id: "reclutamiento-victimas"
+      url_completa: "https://www.datos.gov.co/api/v3/views/gtg9-672t/query.json"
+
+  violencia_sexual:
+    nombre_oficial: "Violencia sexual en el marco del conflicto armado"
+    casos:
+      dataset_id: "violencia-sexual-casos"
+      url_completa: "https://www.datos.gov.co/api/v3/views/k9qg-2svz/query.json"
+    victimas:
+      dataset_id: "violencia-sexual-victimas"
+      url_completa: "https://www.datos.gov.co/api/v3/views/gtg9-672t/query.json"
+

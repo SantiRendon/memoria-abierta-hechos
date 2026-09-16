@@ -1,0 +1,67 @@
+# ==============================================================================
+# ESQUEMA Y REGLAS DE VALIDACIÓN DE COLUMNAS
+# Utilizado por scripts/02_validar_estructura.py
+# ==============================================================================
+
+esquema_casos:
+  columnas_obligatorias:
+    - id_caso
+    - a_o
+    - c_digo_dane_de_municipio
+    - municipio
+    - departamento
+    - total_de_v_ctimas_del_caso
+
+  columnas_opcionales:
+    - id_caso_relacionado
+    - mes
+    - d_a
+    - regi_n
+    - modalidad
+    - presunto_responsable
+    - descripci_n_presunto
+    - latitud_longitud
+
+  tipos_esperados:
+    id_caso: "string"
+    a_o: "int"
+    mes: "string"
+    d_a: "string"
+    c_digo_dane_de_municipio: "string"
+    municipio: "string"
+    departamento: "string"
+    regi_n: "string"
+    modalidad: "string"
+    presunto_responsable: "string"
+    descripci_n_presunto: "string"
+    total_de_v_ctimas_del_caso: "int"
+    latitud_longitud: "string"
+
+esquema_victimas:
+  columnas_obligatorias:
+    - id_caso
+    - a_o
+    - c_digo_dane_de_municipio
+    - municipio
+    - departamento
+
+  columnas_opcionales:
+    - id_victima
+    - sexo
+    - genero
+    - etnia
+    - edad
+    - rango_edad
+    - ocupacion
+    - presunto_responsable
+
+  tipos_esperados:
+    id_caso: "string"
+    id_victima: "string"
+    sexo: "string"
+    genero: "string"
+    etnia: "string"
+    edad: "float"
+    rango_edad: "string"
+    ocupacion: "string"
+

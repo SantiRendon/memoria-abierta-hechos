@@ -1,0 +1,44 @@
+# ==============================================================================
+# CONFIGURACIÓN GLOBAL DEL PROYECTO
+# ==============================================================================
+
+proyecto:
+  nombre: "memoria-historica-predictiva"
+  version: "1.0.0"
+  descripcion: "Pipeline analítico y predictivo de datos de memoria histórica de Colombia"
+  autor: "Santi Rendon"
+
+# Rutas estándar del sistema de archivos (relativas a la raíz del proyecto)
+rutas:
+  hechos: "hechos"
+  scripts: "scripts"
+  sql: "sql"
+  config: "config"
+  docs: "docs"
+  logs: "logs"
+  reports: "reports"
+  tests: "tests"
+
+# Configuración del sistema de logging y trazabilidad
+logging:
+  nivel_consola: "INFO"
+  nivel_archivo: "DEBUG"
+  formato: "%(asctime)s [%(levelname)s] %(message)s"
+  formato_fecha: "%Y-%m-%d %H:%M:%S"
+  archivo_log: "logs/ejecucion_pipeline.log"
+
+# Configuración por defecto de MySQL (respaldo si no se definen en .env)
+mysql_defaults:
+  host: "localhost"
+  port: 3306
+  user: "root"
+  database: "memoria_historica"
+  charset: "utf8mb4"
+
+# Parámetros estándar para experimentación con Scikit-Learn
+machine_learning:
+  random_state: 42
+  test_size: 0.20
+  algoritmo_default: "random_forest"
+  metrica_evaluacion: "f1_weighted"
+

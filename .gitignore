@@ -1,0 +1,58 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+ENV/
+
+# Variables de entorno y secretos
+.env
+.env.local
+.env.*.local
+
+# Bytecode y cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# Datos crudos, intermedios y de features (evitar subir datos masivos o sensibles)
+hechos/*/data/raw/*.csv
+hechos/*/data/raw/*.json
+hechos/*/data/processed/*.csv
+hechos/*/data/processed/*.parquet
+hechos/*/data/features/*.csv
+hechos/*/data/features/*.parquet
+*.csv
+*.parquet
+
+# Excepciones: conservar estructura con .gitkeep si aplica
+!hechos/**/.gitkeep
+
+# Modelos entrenados y checkpoints
+hechos/*/modelos/*.pkl
+hechos/*/modelos/*.joblib
+*.pkl
+*.joblib
+
+# Logs de ejecución
+logs/*.log
+*.log
+
+# Configuraciones de IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+

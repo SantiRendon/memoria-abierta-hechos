@@ -1,0 +1,17 @@
+# Configuración específica para el hecho: Reclutamiento de Niños y Niñas
+hecho:
+  id: "reclutamiento_niños"
+  nombre: "Reclutamiento y Utilización de Niños, Niñas y Adolescentes"
+  descripcion: "Vinculación forzada o coaccionada de menores de 18 años a grupos armados"
+
+archivos:
+  casos_raw: "data/raw/casos_reclutamiento_raw.csv"
+  victimas_raw: "data/raw/victimas_reclutamiento_raw.csv"
+  procesado: "data/processed/reclutamiento_unificado.csv"
+  features: "data/features/features_reclutamiento.csv"
+  modelo: "modelos/modelo_reclutamiento_riesgo.joblib"
+
+parametros_features:
+  ventana_lag_anios: [1, 2, 3]
+  umbral_alto_riesgo_victimas: 3
+
