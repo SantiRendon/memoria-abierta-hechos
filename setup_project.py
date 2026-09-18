@@ -15,6 +15,8 @@ import sys
 DIRECTORIOS = [
     # Hecho: Reclutamiento de Niños y Niñas
     Path("hechos/reclutamiento_niños/data/raw"),
+    Path("hechos/reclutamiento_niños/data/raw/json"),
+    Path("hechos/reclutamiento_niños/data/raw/csv"),
     Path("hechos/reclutamiento_niños/data/processed"),
     Path("hechos/reclutamiento_niños/data/features"),
     Path("hechos/reclutamiento_niños/notebooks"),
@@ -23,6 +25,8 @@ DIRECTORIOS = [
     
     # Hecho: Violencia Sexual
     Path("hechos/violencia_sexual/data/raw"),
+    Path("hechos/violencia_sexual/data/raw/json"),
+    Path("hechos/violencia_sexual/data/raw/csv"),
     Path("hechos/violencia_sexual/data/processed"),
     Path("hechos/violencia_sexual/data/features"),
     Path("hechos/violencia_sexual/notebooks"),

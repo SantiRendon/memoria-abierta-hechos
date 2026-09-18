@@ -2,15 +2,17 @@
 01_extraer_api.py
 =================
 Propósito:
-    Descargar de forma automatizada y dinámica los datos históricos desde la API
+    Descargar de forma automatizada y versionada los datos históricos desde la API
     de Datos Abiertos de Colombia (datos.gov.co / Socrata) para un hecho victimizante
     específico (tanto para 'casos' como para 'víctimas').
 
-    Dinamismo de Formato:
-    - Analiza dinámicamente si la URL configurada termina en '.json' o '.csv'.
-    - Permite alternar extensiones entre JSON y CSV directamente desde el CLI (--formato).
-    - Guarda los archivos crudos en 'data/raw/' tanto en su formato nativo (.json / .csv)
-      como en formato complementario para total interoperabilidad.
+    Buenas Prácticas Implementadas:
+    - Control temporal de descarga: incorpora la fecha de extracción (formato yyyy-mm-dd)
+      en el nombre de los archivos para trazabilidad histórica.
+    - Organización por formato: almacena archivos en subcarpetas dedicadas 'data/raw/json/'
+      y 'data/raw/csv/', facilitando la distinción entre tipos de datos.
+    - Dinamismo de formato: detecta si la URL es .json o .csv y permite alternar
+      mediante el parámetro --formato.
 
 Uso:
     python scripts/01_extraer_api.py --hecho reclutamiento_niños
@@ -25,6 +27,7 @@ import io
 import json
 import argparse
 import time
+from datetime import datetime
 from pathlib import Path
 import requests
 import pandas as pd
@@ -91,17 +94,39 @@ def ajustar_url_segun_formato(url_endpoint, formato_deseado="auto"):
 
 
 def descargar_dataset(url_endpoint, app_token="", limite_por_lote=5000, timeout=120,
-                      carpeta_salida=None, nombre_base=None, formato_solicitado="auto"):
+                      carpeta_data_raw=None, prefijo="casos", hecho="hecho",
+                      fecha_descarga=None, formato_solicitado="auto"):
     """
-    Descarga el dataset desde la API de datos abiertos gestionando dinámicamente
-    formatos JSON y CSV, guardando el archivo nativo según la URL y un espejo
-    para máxima compatibilidad.
+    Descarga el dataset desde la API de datos abiertos.
+    - Crea subcarpetas dedicadas 'data/raw/json/' y 'data/raw/csv/'.
+    - Nombra los archivos con el estándar: {prefijo}_{hecho}_raw_{yyyy-mm-dd}.{ext}
+    - Notifica si ya existía una descarga previa con esa misma fecha.
     """
+    if fecha_descarga is None:
+        fecha_descarga = datetime.now().strftime("%Y-%m-%d")
+
     url_efectiva, formato = ajustar_url_segun_formato(url_endpoint, formato_solicitado)
     
-    print(f"\n[INFO] Conectando a la API:")
+    # Subcarpetas organizadas por formato
+    carpeta_json = carpeta_data_raw / "json"
+    carpeta_csv = carpeta_data_raw / "csv"
+    carpeta_json.mkdir(parents=True, exist_ok=True)
+    carpeta_csv.mkdir(parents=True, exist_ok=True)
+
+    # Nombres de archivo estandarizados con fecha yyyy-mm-dd
+    nombre_archivo_json = f"{prefijo}_{hecho}_raw_{fecha_descarga}.json"
+    nombre_archivo_csv = f"{prefijo}_{hecho}_raw_{fecha_descarga}.csv"
+    ruta_salida_json = carpeta_json / nombre_archivo_json
+    ruta_salida_csv = carpeta_csv / nombre_archivo_csv
+
+    print(f"\n[INFO] Conectando a la API ({prefijo.upper()}):")
     print(f"       URL: {url_efectiva}")
     print(f"  [FORMATO DETECTADO] {formato.upper()}")
+    print(f"  [FECHA DESCARGA]    {fecha_descarga}")
+
+    if ruta_salida_json.exists() or ruta_salida_csv.exists():
+        print(f"  [AVISO TEMPORAL] Ya existe un registro descargado el {fecha_descarga}.")
+        print("                   Se actualizará el archivo con los datos más recientes de la API.")
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) MemoriaHistoricaPredictiva/1.0"
@@ -124,7 +149,7 @@ def descargar_dataset(url_endpoint, app_token="", limite_por_lote=5000, timeout=
         if formato == "json":
             url_limpia = url_efectiva.split("?")[0].lower()
             
-            # Caso A: Endpoints de consulta directa (/query.json)
+            # Caso A: Endpoints directos de consulta (/query.json)
             if "query.json" in url_limpia:
                 print("  [DESCARGA JSON] Solicitando exportación JSON directa...")
                 respuesta = requests.get(url_efectiva, headers=headers, timeout=timeout)
@@ -190,7 +215,7 @@ def descargar_dataset(url_endpoint, app_token="", limite_por_lote=5000, timeout=
             df_resultado = pd.read_csv(io.StringIO(texto_csv), low_memory=False)
 
         # ======================================================================
-        # GUARDADO EN DISCO DINÁMICO (JSON Y CSV)
+        # GUARDADO EN SUBCARPETAS DEDICADAS (JSON Y CSV)
         # ======================================================================
         if df_resultado is not None and not df_resultado.empty:
             tiempo_total = time.time() - inicio_tiempo
@@ -198,24 +223,17 @@ def descargar_dataset(url_endpoint, app_token="", limite_por_lote=5000, timeout=
             print(f"          Registros: {len(df_resultado):,}")
             print(f"          Columnas:  {len(df_resultado.columns)}")
 
-            if carpeta_salida and nombre_base:
-                carpeta_salida.mkdir(parents=True, exist_ok=True)
-                
-                ruta_json = carpeta_salida / f"{nombre_base}.json"
-                ruta_csv = carpeta_salida / f"{nombre_base}.csv"
+            # 1. Guardar en carpeta json/
+            if datos_json_raw is not None:
+                with open(ruta_salida_json, "w", encoding="utf-8") as f:
+                    json.dump(datos_json_raw, f, ensure_ascii=False, indent=2)
+            else:
+                df_resultado.to_json(ruta_salida_json, orient="records", force_ascii=False, indent=2)
+            print(f"  [GUARDADO JSON] {ruta_salida_json}")
 
-                # 1. Guardar archivo JSON
-                if datos_json_raw is not None:
-                    with open(ruta_json, "w", encoding="utf-8") as f:
-                        json.dump(datos_json_raw, f, ensure_ascii=False, indent=2)
-                else:
-                    # Si vino en CSV, exportar también a JSON para tener ambos disponibles
-                    df_resultado.to_json(ruta_json, orient="records", force_ascii=False, indent=2)
-                print(f"  [GUARDADO JSON] {ruta_json}")
-
-                # 2. Guardar archivo CSV
-                df_resultado.to_csv(ruta_csv, index=False, encoding="utf-8")
-                print(f"  [GUARDADO CSV]  {ruta_csv}")
+            # 2. Guardar en carpeta csv/
+            df_resultado.to_csv(ruta_salida_csv, index=False, encoding="utf-8")
+            print(f"  [GUARDADO CSV]  {ruta_salida_csv}")
 
             return df_resultado
         else:
@@ -235,7 +253,7 @@ def descargar_dataset(url_endpoint, app_token="", limite_por_lote=5000, timeout=
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Extractor dinámico de datos de Memoria Histórica (JSON y CSV)"
+        description="Extractor de datos de Memoria Histórica con versionado por fecha y subcarpetas"
     )
     parser.add_argument(
         "--hecho",
@@ -249,16 +267,26 @@ def main():
         type=str,
         choices=["auto", "json", "csv"],
         default="auto",
-        help="Formato solicitado: 'auto' (según la URL en YAML), 'json' o 'csv'"
+        help="Formato solicitado: 'auto' (según URL en YAML), 'json' o 'csv'"
+    )
+    parser.add_argument(
+        "--fecha",
+        type=str,
+        default=None,
+        help="Fecha de la extracción en formato yyyy-mm-dd (por defecto: hoy)"
     )
     args = parser.parse_args()
     hecho = args.hecho
     formato_solicitado = args.formato
+    
+    # Fecha de descarga (yyyy-mm-dd)
+    fecha_descarga = args.fecha if args.fecha else datetime.now().strftime("%Y-%m-%d")
 
-    print("=" * 70)
-    print(f"[ETAPA 01] EXTRACCIÓN DINÁMICA DE DATOS API - HECHO: {hecho.upper()}")
-    print(f"Modo de formato: {formato_solicitado.upper()}")
-    print("=" * 70)
+    print("=" * 75)
+    print(f"[ETAPA 01] EXTRACCIÓN DE DATOS API - HECHO: {hecho.upper()}")
+    print(f"Fecha de descarga registrada: {fecha_descarga}")
+    print(f"Modo de formato:              {formato_solicitado.upper()}")
+    print("=" * 75)
 
     config = cargar_config()
     if hecho not in config.get("hechos", {}):
@@ -272,38 +300,42 @@ def main():
     timeout = config.get("api_general", {}).get("timeout_segundos", 120)
 
     # 1. Extracción Nivel Casos
-    print("\n" + "-" * 55)
+    print("\n" + "-" * 60)
     print("--- 1. Extrayendo Nivel Casos ---")
-    print("-" * 55)
+    print("-" * 60)
     url_casos = info_hecho["casos"]["url_completa"]
     descargar_dataset(
         url_endpoint=url_casos,
         app_token=SODATA_APP_TOKEN,
         limite_por_lote=limite_lote,
         timeout=timeout,
-        carpeta_salida=carpeta_data_raw,
-        nombre_base=f"casos_{hecho}_raw",
+        carpeta_data_raw=carpeta_data_raw,
+        prefijo="casos",
+        hecho=hecho,
+        fecha_descarga=fecha_descarga,
         formato_solicitado=formato_solicitado
     )
 
     # 2. Extracción Nivel Víctimas
-    print("\n" + "-" * 55)
+    print("\n" + "-" * 60)
     print("--- 2. Extrayendo Nivel Víctimas ---")
-    print("-" * 55)
+    print("-" * 60)
     url_victimas = info_hecho["victimas"]["url_completa"]
     descargar_dataset(
         url_endpoint=url_victimas,
         app_token=SODATA_APP_TOKEN,
         limite_por_lote=limite_lote,
         timeout=timeout,
-        carpeta_salida=carpeta_data_raw,
-        nombre_base=f"victimas_{hecho}_raw",
+        carpeta_data_raw=carpeta_data_raw,
+        prefijo="victimas",
+        hecho=hecho,
+        fecha_descarga=fecha_descarga,
         formato_solicitado=formato_solicitado
     )
 
-    print("\n" + "=" * 70)
-    print(f"[INFO] Proceso de extracción dinámico completado para: {hecho}")
-    print("=" * 70)
+    print("\n" + "=" * 75)
+    print(f"[INFO] Extracción finalizada exitosamente para: {hecho} ({fecha_descarga})")
+    print("=" * 75)
 
 
 if __name__ == "__main__":

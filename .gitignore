@@ -23,8 +23,12 @@ htmlcov/
 *-checkpoint.ipynb
 
 # Datos crudos, intermedios y de features (evitar subir datos masivos o sensibles)
+hechos/*/data/raw/**/*.csv
+hechos/*/data/raw/**/*.json
 hechos/*/data/raw/*.csv
 hechos/*/data/raw/*.json
+hechos/*/data/raw/json/
+hechos/*/data/raw/csv/
 hechos/*/data/processed/*.csv
 hechos/*/data/processed/*.parquet
 hechos/*/data/features/*.csv

@@ -72,14 +72,31 @@ def validar_archivo(ruta_csv, esquema_esperado, nombre_dataset="Dataset"):
 
 
 def resolver_archivo_raw(carpeta_raw, prefijo, hecho):
-    """Busca dinámicamente si el archivo crudo está en formato .json o .csv."""
-    archivo_json = carpeta_raw / f"{prefijo}_{hecho}_raw.json"
-    if archivo_json.exists():
-        return archivo_json
-    archivo_csv = carpeta_raw / f"{prefijo}_{hecho}_raw.csv"
-    if archivo_csv.exists():
-        return archivo_csv
-    return archivo_json
+    """
+    Busca dinámicamente el archivo crudo más reciente en las subcarpetas
+    'json/' y 'csv/' respetando el versionado de fecha yyyy-mm-dd.
+    """
+    # 1. Buscar en subcarpeta json/ (archivo más reciente por nombre/fecha)
+    carpeta_json = carpeta_raw / "json"
+    if carpeta_json.exists():
+        archivos_json = sorted(list(carpeta_json.glob(f"{prefijo}_{hecho}_raw_*.json")), reverse=True)
+        if archivos_json:
+            return archivos_json[0]
+            
+    # 2. Buscar en subcarpeta csv/ (archivo más reciente por nombre/fecha)
+    carpeta_csv = carpeta_raw / "csv"
+    if carpeta_csv.exists():
+        archivos_csv = sorted(list(carpeta_csv.glob(f"{prefijo}_{hecho}_raw_*.csv")), reverse=True)
+        if archivos_csv:
+            return archivos_csv[0]
+            
+    # 3. Respaldo en carpeta raíz de datos crudos
+    for ext in ["json", "csv"]:
+        candidatos = sorted(list(carpeta_raw.glob(f"{prefijo}_{hecho}_raw*.{ext}")), reverse=True)
+        if candidatos:
+            return candidatos[0]
+            
+    return carpeta_raw / "json" / f"{prefijo}_{hecho}_raw.json"
 
 
 def main():
