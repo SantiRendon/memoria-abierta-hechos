@@ -22,6 +22,7 @@ from pathlib import Path
 PIPELINE_SCRIPTS = [
     ("01_extraer_api.py", "Descarga de datos crudos desde API"),
     ("02_validar_estructura.py", "Validación de calidad y esquema"),
+    ("02_1_validar_integridad.py", "Validación de integridad referencial PK-FK y consistencia numérica"),
     ("03_unificar_datos.py", "Cruce y normalización de casos y víctimas"),
     ("04_crear_features.py", "Ingeniería de variables para ML"),
     ("05_entrenar_modelo.py", "Entrenamiento y evaluación de modelo"),

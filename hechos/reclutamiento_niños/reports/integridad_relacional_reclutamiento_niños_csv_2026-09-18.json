@@ -1,0 +1,28 @@
+{
+  "hecho": "reclutamiento_niños",
+  "fecha_auditoria": "2026-09-18",
+  "estadisticas_generales": {
+    "total_casos_registros": 17373,
+    "total_casos_unicos_pk": 17373,
+    "total_victimas_registros": 18394,
+    "porcentaje_coincidencia_conteo": 100.0
+  },
+  "integridad_pk_fk": {
+    "casos_sin_victimas_count": 0,
+    "victimas_sin_caso_count": 0,
+    "casos_sin_victimas_ids": [],
+    "victimas_sin_caso_ids": []
+  },
+  "discrepancias_conteo_victimas": {
+    "total_coincidentes": 17373,
+    "total_mayor_en_caso": 0,
+    "total_menor_en_caso": 0,
+    "array_mayor_en_caso": [],
+    "array_menor_en_caso": []
+  },
+  "coherencia_atributos_cruzados": {
+    "a_o": 0,
+    "c_digo_dane_de_municipio": 0
+  },
+  "es_aprobado": true
+}

@@ -54,6 +54,7 @@ ARCHIVOS_BASE = [
     # Scripts del pipeline
     Path("scripts/01_extraer_api.py"),
     Path("scripts/02_validar_estructura.py"),
+    Path("scripts/02_1_validar_integridad.py"),
     Path("scripts/03_unificar_datos.py"),
     Path("scripts/04_crear_features.py"),
     Path("scripts/05_entrenar_modelo.py"),

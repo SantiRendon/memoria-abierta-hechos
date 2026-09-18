@@ -22,33 +22,37 @@ Este documento detalla la arquitectura operativa del pipeline, describiendo las 
   hechos/{h}/data/raw/                hechos/{h}/data/raw/
       casos.csv                           victimas.csv
              │                                   │
-             └─────────────────┬─────────────────┘
-                               ▼
-               [ 02_validar_estructura.py ]
-            (Valida esquema, nulos, consistencia)
-                               │
-                               ▼
-                   [ 03_unificar_datos.py ]
-          (Une casos y víctimas por id_caso + DANE)
-                               │
-                               ▼
-                  hechos/{h}/data/processed/
-                        hechos_unificados.csv
-                               │
-             ┌─────────────────┴─────────────────┐
-             ▼                                   ▼
-   [ 04_crear_features.py ]             [ 06_cargar_mysql.py ]
-             │                                   │
-             ▼                                   ▼
-  hechos/{h}/data/features/               Base de Datos MySQL
-     dataset_modelo.csv                   (Tablas analíticas)
-             │                                   │
-             ▼                                   ▼
-  [ 05_entrenar_modelo.py ]                [ Power BI Dashboard ]
-             │
-             ▼
-  hechos/{h}/modelos/
-     modelo_riesgo.joblib
+              └─────────────────┬─────────────────┘
+                                ▼
+                [ 02_validar_estructura.py ]
+             (Valida esquema, nulos, consistencia)
+                                │
+                                ▼
+             [ 02_1_validar_integridad.py ]
+        (Auditoría PK-FK, huérfanos y total_de_v_ctimas)
+                                │
+                                ▼
+                    [ 03_unificar_datos.py ]
+           (Une casos y víctimas por id_caso + DANE)
+                                │
+                                ▼
+                   hechos/{h}/data/processed/
+                         hechos_unificados.csv
+                                │
+              ┌─────────────────┴─────────────────┐
+              ▼                                   ▼
+    [ 04_crear_features.py ]             [ 06_cargar_mysql.py ]
+              │                                   │
+              ▼                                   ▼
+   hechos/{h}/data/features/               Base de Datos MySQL
+      dataset_modelo.csv                   (Tablas analíticas)
+              │                                   │
+              ▼                                   ▼
+   [ 05_entrenar_modelo.py ]                [ Power BI Dashboard ]
+              │
+              ▼
+   hechos/{h}/modelos/
+      modelo_riesgo.joblib
 ```
 
 ---
@@ -61,24 +65,42 @@ Este documento detalla la arquitectura operativa del pipeline, describiendo las 
   - Configuración de URLs y parámetros en `config/api_endpoints.yaml`.
   - Token de acceso en `.env` (si existe).
   - Parámetro `--hecho` (ej. `reclutamiento_niños` o `violencia_sexual`).
+  - Opciones de `--formato` (`auto`, `json`, `csv`).
 - **Procesamiento:**
-  - Realiza peticiones HTTP GET paginadas (`$limit` y `$offset`) hasta agotar registros.
-  - Informa el avance por lotes en la consola.
+  - Detección automática del formato según terminación del endpoint.
+  - Peticiones paginadas (`$limit` y `$offset`) hasta agotar registros.
+  - Notificación de progreso por lotes en consola.
 - **Salida:**
-  - `hechos/{hecho}/data/raw/casos_raw.csv`
-  - `hechos/{hecho}/data/raw/victimas_raw.csv`
+  - `hechos/{hecho}/data/raw/{json,csv}/casos_{hecho}_raw_yyyy-mm-dd.{json,csv}`
+  - `hechos/{hecho}/data/raw/{json,csv}/victimas_{hecho}_raw_yyyy-mm-dd.{json,csv}`
 
 ---
 
 ### Script `02_validar_estructura.py`
 - **Propósito:** Validar la calidad y conformidad del esquema de datos antes de iniciar transformaciones complejas.
-- **Entrada:** Archivos crudos en `hechos/{hecho}/data/raw/` y reglas en `config/columnas_requeridas.yaml`.
+- **Entrada:** Archivos crudos en `hechos/{hecho}/data/raw/` y reglas modulares en `config/esquema_datos.yaml` / `config/columnas_requeridas.yaml`.
 - **Procesamiento:**
-  - Verifica presencia de columnas mandatorias (`id_caso`, `a_o`, `municipio`, etc.).
-  - Analiza porcentajes de nulos y duplicados.
-  - Valida tipos de datos (numéricos, fechas, texto).
+  - Selección de formato (`--formato auto|json|csv`).
+  - Verifica presencia de columnas transversales obligatorias (`id_caso`, `a_o`, `municipio`, etc.) y específicas por hecho.
+  - Filtra metadatos de Socrata (`:id`, `:created_at`).
+  - Analiza porcentajes de nulos y cardinalidad/unicidad.
 - **Salida:**
-  - Log en consola y reporte opcional de calidad en `hechos/{hecho}/reports/calidad_datos.txt`.
+  - Log en consola con dictamen claro.
+  - Reporte JSON de calidad en `hechos/{hecho}/reports/calidad_datos_{hecho}_{formato}_{fecha}.json`.
+
+---
+
+### Script `02_1_validar_integridad.py`
+- **Propósito:** Auditar la integridad relacional referencial (PK-FK) y la coherencia cuantitativa de víctimas entre las tablas de Casos y Víctimas.
+- **Entrada:** Archivos crudos de Casos y Víctimas de un hecho específico.
+- **Procesamiento:**
+  - **Integridad PK-FK:** Detección de casos huérfanos (sin víctimas) y víctimas huérfanas (sin caso existente en tabla casos).
+  - **Consistencia Numérica:** Compara el valor numérico declarado en `total_de_v_ctimas_del_caso` contra el conteo real de registros asociados en Víctimas.
+  - **Clasificación de Discrepancias:** Guarda arrays de casos discrepantes identificando `MAYOR_EN_CASO` (declara más de las que hay) y `MENOR_EN_CASO` (hay más registros que los declarados).
+  - **Consistencia Espacio-Temporal:** Verifica coherencia de `a_o` y `c_digo_dane_de_municipio` entre caso y víctimas vinculadas.
+- **Salida:**
+  - Dictamen en consola (`APROBADO PERFECTO`, `APROBADO CON OBSERVACIONES` o `REVISIÓN CRÍTICA`).
+  - Reporte JSON detallado en `hechos/{hecho}/reports/integridad_relacional_{hecho}_{formato}_{fecha}.json`.
 
 ---
 
