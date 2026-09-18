@@ -1,0 +1,26 @@
+{
+  "hecho": "violencia_sexual",
+  "formato_auditado": "csv",
+  "fecha_auditoria": "2026-09-17",
+  "casos": {
+    "dataset": "Casos (CSV) - violencia_sexual",
+    "filas": 16778,
+    "columnas_negocio": 26,
+    "faltantes_obligatorias": [],
+    "faltantes_opcionales": [],
+    "extras_no_registradas": [],
+    "infracciones_nulos": {},
+    "es_valido": true
+  },
+  "victimas": {
+    "dataset": "Víctimas (CSV) - violencia_sexual",
+    "filas": 17790,
+    "columnas_negocio": 19,
+    "faltantes_obligatorias": [],
+    "faltantes_opcionales": [],
+    "extras_no_registradas": [],
+    "infracciones_nulos": {},
+    "es_valido": true
+  },
+  "aprobacion_global": true
+}

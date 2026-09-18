@@ -20,7 +20,7 @@ hechos:
       url_completa: "https://www.datos.gov.co/api/v3/views/hzd2-7ea7/query.json"
     victimas:
       dataset_id: "reclutamiento-victimas"
-      url_completa: "https://www.datos.gov.co/api/v3/views/gtg9-672t/query.json"
+      url_completa: "https://www.datos.gov.co/api/v3/views/fc55-h9nc/query.json"
 
   violencia_sexual:
     nombre_oficial: "Violencia sexual en el marco del conflicto armado"

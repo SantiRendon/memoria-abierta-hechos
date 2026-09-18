@@ -1,0 +1,932 @@
+# ==============================================================================
+# ESQUEMA DE DATOS Y CONTRATO DE CALIDAD
+# Centro Nacional de Memoria Histórica (datos.gov.co)
+# ==============================================================================
+
+metadatos_sistema:
+  - ":id"
+  - ":version"
+  - ":created_at"
+  - ":updated_at"
+
+# ------------------------------------------------------------------------------
+# 1. CAMPOS TRANSVERSALES (Compartidos por todos los hechos victimizantes)
+# ------------------------------------------------------------------------------
+campos_comunes:
+  identificadores:
+    id_caso:
+      nombre_columna: "ID Caso"
+      tipo_api: "Number"
+      tipo_python: "int"
+      requerido: true
+      permite_nulos: false
+      descripcion: "Identificador numérico único del caso o evento victimizante."
+
+    id_persona:
+      nombre_columna: "ID Persona"
+      tipo_api: "Number"
+      tipo_python: "int"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Identificador numérico de la persona en el registro individual."
+
+  geografia:
+    c_digo_dane_de_municipio:
+      nombre_columna: "Código DANE de Municipio"
+      tipo_api: "Text"
+      tipo_python: "string"
+      requerido: true
+      permite_nulos: false
+      descripcion: "Código oficial DANE de 5 dígitos del municipio."
+
+    municipio:
+      nombre_columna: "Municipio"
+      tipo_api: "Text"
+      tipo_python: "string"
+      requerido: true
+      permite_nulos: false
+      descripcion: "Nombre oficial del municipio donde ocurrieron los hechos."
+
+    departamento:
+      nombre_columna: "Departamento"
+      tipo_api: "Text"
+      tipo_python: "string"
+      requerido: true
+      permite_nulos: false
+      descripcion: "Nombre del departamento donde ocurrieron los hechos."
+
+    regi_n:
+      nombre_columna: "Región"
+      tipo_api: "Text"
+      tipo_python: "string"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Subregión geográfica del CNMH (ej. Urabá, Bajo Cauca)."
+
+    latitud_longitud:
+      nombre_columna: "latitud-longitud"
+      tipo_api: "Point"
+      tipo_python: "object"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Coordenadas geográficas espaciales."
+
+  tiempo:
+    a_o:
+      nombre_columna: "Año"
+      tipo_api: "Number"
+      tipo_python: "int"
+      requerido: true
+      permite_nulos: false
+      descripcion: "Año de ocurrencia del hecho."
+
+    mes:
+      nombre_columna: "Mes"
+      tipo_api: "Number"
+      tipo_python: "int"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Mes de ocurrencia (1-12 o 0 sin información)."
+
+    d_a:
+      nombre_columna: "Día"
+      tipo_api: "Number"
+      tipo_python: "int"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Día de ocurrencia (1-31 o 0 sin información)."
+
+  caracterizacion_persona:
+    sexo:
+      nombre_columna: "Sexo"
+      tipo_api: "Text"
+      tipo_python: "string"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Sexo biológico o de identidad de la persona."
+
+    etnia:
+      nombre_columna: "Etnia"
+      tipo_api: "Text"
+      tipo_python: "string"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Pertenencia étnica autorreconocida (Indígena, Afro, etc.)."
+
+    ocupaci_n:
+      nombre_columna: "Ocupación"
+      tipo_api: "Text"
+      tipo_python: "string"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Ocupación o actividad comunitaria de la víctima."
+
+    edad:
+      nombre_columna: "Edad"
+      tipo_api: "Text"
+      tipo_python: "string"
+      requerido: false
+      permite_nulos: true
+      descripcion: "Edad registrada al momento del hecho victimizante."
+
+# ------------------------------------------------------------------------------
+# 2. ESQUEMAS MODULARES POR HECHO VICTIMIZANTE
+# ------------------------------------------------------------------------------
+hechos:
+
+  # ============================================================================
+  # RECLUTAMIENTO Y UTILIZACIÓN DE NIÑOS, NIÑAS Y ADOLESCENTES
+  # ============================================================================
+  reclutamiento_niños:
+    nombre_oficial: "Reclutamiento y Utilización de Niños, Niñas y Adolescentes"
+
+    # --------------------------------------------------------------------------
+    # Nivel Casos (27 Columnas)
+    # --------------------------------------------------------------------------
+    casos:
+      total_columnas_esperadas: 27
+      columnas:
+        id_caso:
+          nombre_columna: "ID Caso"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        id_caso_relacionado:
+          nombre_columna: "ID Caso Relacionado"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        a_o:
+          nombre_columna: "Año"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        mes:
+          nombre_columna: "Mes"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        d_a:
+          nombre_columna: "Día"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        c_digo_dane_de_municipio:
+          nombre_columna: "Código DANE de Municipio"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        municipio:
+          nombre_columna: "Municipio"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        departamento:
+          nombre_columna: "Departamento"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        regi_n:
+          nombre_columna: "Región"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        modalidad:
+          nombre_columna: "Modalidad"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        presunto_responsable:
+          nombre_columna: "Presunto Responsable"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        descripci_n_presunto:
+          nombre_columna: "Descripción Presunto Responsable"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        abandono_o_despojo_forzado:
+          nombre_columna: "Abandono o Despojo Forzado de Tierras"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        amenaza_o_intimidaci_n:
+          nombre_columna: "Amenaza o Intimidación"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        ataque_contra_misi_n_m_dica:
+          nombre_columna: "Ataque Contra Misión Médica"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        confinamiento_o_restricci:
+          nombre_columna: "Confinamiento o Restricción a la Movilidad"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        desplazamiento_forzado:
+          nombre_columna: "Desplazamiento Forzado"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        extorsi_n:
+          nombre_columna: "Extorsión"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        lesionados_civiles:
+          nombre_columna: "Lesionados Civiles"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        pillaje:
+          nombre_columna: "Pillaje"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        tortura:
+          nombre_columna: "Tortura"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        violencia_basada_en_g_nero:
+          nombre_columna: "Violencia Basada en Género"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        otro_hecho_simult_neo:
+          nombre_columna: "Otro Hecho Simultáneo"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        total_de_v_ctimas_del_caso:
+          nombre_columna: "Total de Víctimas del Caso"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        forma_de_vinculaci_n:
+          nombre_columna: "Forma de Vinculación"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        tipo_de_vinculaci_n:
+          nombre_columna: "Tipo de Vinculación"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        latitud_longitud:
+          nombre_columna: "latitud-longitud"
+          tipo_api: "Point"
+          tipo_python: "object"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+
+    # --------------------------------------------------------------------------
+    # Nivel Víctimas (36 Columnas)
+    # --------------------------------------------------------------------------
+    victimas:
+      total_columnas_esperadas: 36
+      columnas:
+        id_caso:
+          nombre_columna: "ID Caso"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        c_digo_dane_de_municipio:
+          nombre_columna: "Código DANE de Municipio"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        municipio:
+          nombre_columna: "Municipio"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        departamento:
+          nombre_columna: "Departamento"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        a_o:
+          nombre_columna: "Año"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        mes:
+          nombre_columna: "Mes"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        d_a:
+          nombre_columna: "Día"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        id_persona:
+          nombre_columna: "ID Persona"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        sexo:
+          nombre_columna: "Sexo"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        etnia:
+          nombre_columna: "Etnia"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        ocupaci_n:
+          nombre_columna: "Ocupación"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        caletera:
+          nombre_columna: "Caletera"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        campanera:
+          nombre_columna: "Campanera"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        cocinera:
+          nombre_columna: "Cocinera"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        comandante:
+          nombre_columna: "Comandante"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        combatiente:
+          nombre_columna: "Combatiente"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        contabilidad:
+          nombre_columna: "Contabilidad"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        entrenamiento:
+          nombre_columna: "Entrenamiento"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        escolta:
+          nombre_columna: "Escolta"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        extorsiones:
+          nombre_columna: "Extorsiones"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        fabricaci_n_de_otras_armas:
+          nombre_columna: "Fabricación de Otras Armas No Convencionales"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        fabricaci_n_y_o_siembra_de:
+          nombre_columna: "Fabricación y/o Siembra de Minas Antipersonal"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        guardia:
+          nombre_columna: "Guardia"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        informante:
+          nombre_columna: "Informante"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        patrullera:
+          nombre_columna: "Patrullera"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        radio_operaciones:
+          nombre_columna: "Radio Operaciones"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        raspach_n:
+          nombre_columna: "Raspachín"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        servicios_de_salud:
+          nombre_columna: "Servicios de Salud"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        sicariato:
+          nombre_columna: "Sicariato"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        trabajo_organizativo:
+          nombre_columna: "Trabajo Organizativo"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        tr_fico_de_estupefacientes:
+          nombre_columna: "Tráfico de Estupefacientes"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        transporte_de_armas:
+          nombre_columna: "Transporte de Armas"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        sin_informaci_n_de_oficios:
+          nombre_columna: "Sin Información de Oficios Realizados"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        otro_oficio_realizado:
+          nombre_columna: "Otro Oficio Realizado"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        edad:
+          nombre_columna: "Edad"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        latitud_longitud:
+          nombre_columna: "latitud-longitud"
+          tipo_api: "Point"
+          tipo_python: "object"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+
+  # ============================================================================
+  # VIOLENCIA SEXUAL EN EL MARCO DEL CONFLICTO ARMADO
+  # ============================================================================
+  violencia_sexual:
+    nombre_oficial: "Violencia Sexual en el Marco del Conflicto Armado"
+
+    # --------------------------------------------------------------------------
+    # Nivel Casos (27 Columnas)
+    # --------------------------------------------------------------------------
+    casos:
+      total_columnas_esperadas: 26
+      columnas:
+        id_caso:
+          nombre_columna: "ID Caso"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        id_caso_relacionado:
+          nombre_columna: "ID Caso Relacionado"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        a_o:
+          nombre_columna: "Año"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        mes:
+          nombre_columna: "Mes"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        d_a:
+          nombre_columna: "Día"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        c_digo_dane_de_municipio:
+          nombre_columna: "Código DANE de Municipio"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        municipio:
+          nombre_columna: "Municipio"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        departamento:
+          nombre_columna: "Departamento"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        regi_n:
+          nombre_columna: "Región"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        modalidad:
+          nombre_columna: "Modalidad"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        presunto_responsable:
+          nombre_columna: "Presunto Responsable"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        descripci_n_presunto:
+          nombre_columna: "Descripción Presunto Responsable"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        abandono_o_despojo_forzado:
+          nombre_columna: "Abandono o Despojo Forzado de Tierras"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        amenaza_o_intimidaci_n:
+          nombre_columna: "Amenaza o Intimidación"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        ataque_contra_misi_n_m_dica:
+          nombre_columna: "Ataque Contra Misión Médica"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        confinamiento_o_restricci:
+          nombre_columna: "Confinamiento o Restricción a la Movilidad"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        desplazamiento_forzado:
+          nombre_columna: "Desplazamiento Forzado"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        extorsi_n:
+          nombre_columna: "Extorsión"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        lesionados_civiles:
+          nombre_columna: "Lesionados Civiles"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        pillaje:
+          nombre_columna: "Pillaje"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        tortura:
+          nombre_columna: "Tortura"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        violencia_basada_en_g_nero:
+          nombre_columna: "Violencia Basada en Género"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        otro_hecho_simult_neo:
+          nombre_columna: "Otro Hecho Simultáneo"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        total_de_v_ctimas_del_caso:
+          nombre_columna: "Total de Víctimas del Caso"
+          tipo_api: "Number"
+          tipo_python: "float"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        tipo_de_armas:
+          nombre_columna: "Tipo de Armas"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+          descripcion: "Tipo de armas empleadas en la comisión del hecho."
+        latitud_longitud:
+          nombre_columna: "latitud-longitud"
+          tipo_api: "Point"
+          tipo_python: "object"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+
+    # --------------------------------------------------------------------------
+    # Nivel Víctimas (19 Columnas)
+    # --------------------------------------------------------------------------
+    victimas:
+      total_columnas_esperadas: 19
+      columnas:
+        id_caso:
+          nombre_columna: "ID Caso"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        c_digo_dane_de_municipio:
+          nombre_columna: "Código DANE de Municipio"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        municipio:
+          nombre_columna: "Municipio"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        departamento:
+          nombre_columna: "Departamento"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        a_o:
+          nombre_columna: "Año"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: true
+          permite_nulos: false
+          es_transversal: true
+        mes:
+          nombre_columna: "Mes"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        d_a:
+          nombre_columna: "Día"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        id_persona:
+          nombre_columna: "ID Persona"
+          tipo_api: "Number"
+          tipo_python: "int"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        sexo:
+          nombre_columna: "Sexo"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        etnia:
+          nombre_columna: "Etnia"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        ocupaci_n:
+          nombre_columna: "Ocupación"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        calidad_de_la_v_ctima_o_la:
+          nombre_columna: "Calidad de la Víctima o la Baja"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        tipo_de_poblaci_n_vulnerable:
+          nombre_columna: "Tipo de Población Vulnerable"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        militante_pol_tico:
+          nombre_columna: "Militante Político"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        fuerza_o_grupo_armado:
+          nombre_columna: "Fuerza o Grupo Armado Organizado al que Pertenece el Combatiente"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        descripci_n_fuerza_o_grupo:
+          nombre_columna: "Descripción Fuerza o Grupo Armado Organizado al que Pertenece el Combatiente"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        situaci_n_actual_de_la_v:
+          nombre_columna: "Situación Actual de la Víctima"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: false
+        edad:
+          nombre_columna: "Edad"
+          tipo_api: "Text"
+          tipo_python: "string"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true
+        latitud_longitud:
+          nombre_columna: "latitud-longitud"
+          tipo_api: "Point"
+          tipo_python: "object"
+          requerido: false
+          permite_nulos: true
+          es_transversal: true

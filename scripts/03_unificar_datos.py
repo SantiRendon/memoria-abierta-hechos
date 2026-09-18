@@ -74,32 +74,52 @@ def unificar(ruta_casos_csv, ruta_victimas_csv, ruta_salida_csv):
     return None
 
 
-def resolver_archivo_raw(carpeta_raw, prefijo, hecho):
+def resolver_archivo_raw(carpeta_raw, prefijo, hecho, formato="auto", fecha=None):
     """
-    Busca dinámicamente el archivo crudo más reciente en las subcarpetas
-    'json/' y 'csv/' respetando el versionado de fecha yyyy-mm-dd.
+    Busca dinámicamente el archivo crudo en las subcarpetas 'json/' y 'csv/'
+    según el formato solicitado (auto, json, csv) y fecha opcional.
     """
-    # 1. Buscar en subcarpeta json/ (archivo más reciente por nombre/fecha)
-    carpeta_json = carpeta_raw / "json"
-    if carpeta_json.exists():
-        archivos_json = sorted(list(carpeta_json.glob(f"{prefijo}_{hecho}_raw_*.json")), reverse=True)
-        if archivos_json:
-            return archivos_json[0]
+    formato = formato.lower().strip()
+    patron_fecha = f"_{fecha}" if fecha else "_*"
+    
+    # 1. Si se solicita explícitamente JSON
+    if formato == "json":
+        carpeta_json = carpeta_raw / "json"
+        if carpeta_json.exists():
+            archivos = sorted(list(carpeta_json.glob(f"{prefijo}_{hecho}_raw{patron_fecha}.json")), reverse=True)
+            if archivos:
+                return archivos[0]
+        archivos_raiz = sorted(list(carpeta_raw.glob(f"{prefijo}_{hecho}_raw*.json")), reverse=True)
+        return archivos_raiz[0] if archivos_raiz else None
+
+    # 2. Si se solicita explícitamente CSV
+    elif formato == "csv":
+        carpeta_csv = carpeta_raw / "csv"
+        if carpeta_csv.exists():
+            archivos = sorted(list(carpeta_csv.glob(f"{prefijo}_{hecho}_raw{patron_fecha}.csv")), reverse=True)
+            if archivos:
+                return archivos[0]
+        archivos_raiz = sorted(list(carpeta_raw.glob(f"{prefijo}_{hecho}_raw*.csv")), reverse=True)
+        return archivos_raiz[0] if archivos_raiz else None
+
+    # 3. Modo 'auto': buscar el más reciente entre json/ y csv/
+    else:
+        candidatos = []
+        carpeta_json = carpeta_raw / "json"
+        if carpeta_json.exists():
+            candidatos.extend(carpeta_json.glob(f"{prefijo}_{hecho}_raw{patron_fecha}.json"))
             
-    # 2. Buscar en subcarpeta csv/ (archivo más reciente por nombre/fecha)
-    carpeta_csv = carpeta_raw / "csv"
-    if carpeta_csv.exists():
-        archivos_csv = sorted(list(carpeta_csv.glob(f"{prefijo}_{hecho}_raw_*.csv")), reverse=True)
-        if archivos_csv:
-            return archivos_csv[0]
-            
-    # 3. Respaldo en carpeta raíz de datos crudos
-    for ext in ["json", "csv"]:
-        candidatos = sorted(list(carpeta_raw.glob(f"{prefijo}_{hecho}_raw*.{ext}")), reverse=True)
+        carpeta_csv = carpeta_raw / "csv"
+        if carpeta_csv.exists():
+            candidatos.extend(carpeta_csv.glob(f"{prefijo}_{hecho}_raw{patron_fecha}.csv"))
+
+        candidatos.extend(carpeta_raw.glob(f"{prefijo}_{hecho}_raw*.json"))
+        candidatos.extend(carpeta_raw.glob(f"{prefijo}_{hecho}_raw*.csv"))
+
         if candidatos:
-            return candidatos[0]
-            
-    return carpeta_raw / "json" / f"{prefijo}_{hecho}_raw.json"
+            return sorted(candidatos, reverse=True)[0]
+
+    return None
 
 
 def main():
@@ -111,19 +131,37 @@ def main():
         choices=["reclutamiento_niños", "violencia_sexual"],
         help="Nombre del hecho victimizante a unificar"
     )
+    parser.add_argument(
+        "--formato",
+        type=str,
+        choices=["auto", "json", "csv"],
+        default="auto",
+        help="Formato de archivo a utilizar: 'auto' (más reciente), 'json' o 'csv'"
+    )
+    parser.add_argument(
+        "--fecha",
+        type=str,
+        default=None,
+        help="Fecha específica a unificar en formato yyyy-mm-dd (por defecto: la más reciente)"
+    )
     args = parser.parse_args()
     hecho = args.hecho
+    formato = args.formato
+    fecha = args.fecha
 
     print("=" * 70)
     print(f"[ETAPA 03] UNIFICACIÓN DE DATOS - HECHO: {hecho.upper()}")
+    print(f"Modo de formato: {formato.upper()}")
+    if fecha:
+        print(f"Fecha filtrada:  {fecha}")
     print("=" * 70)
 
     carpeta_raw = Path(f"hechos/{hecho}/data/raw")
     carpeta_processed = Path(f"hechos/{hecho}/data/processed")
     carpeta_processed.mkdir(parents=True, exist_ok=True)
 
-    ruta_casos = resolver_archivo_raw(carpeta_raw, "casos", hecho)
-    ruta_victimas = resolver_archivo_raw(carpeta_raw, "victimas", hecho)
+    ruta_casos = resolver_archivo_raw(carpeta_raw, "casos", hecho, formato=formato, fecha=fecha)
+    ruta_victimas = resolver_archivo_raw(carpeta_raw, "victimas", hecho, formato=formato, fecha=fecha)
     ruta_salida = carpeta_processed / f"{hecho}_unificado.csv"
 
     unificar(ruta_casos, ruta_victimas, ruta_salida)
