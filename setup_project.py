@@ -52,8 +52,12 @@ ARCHIVOS_BASE = [
     # Configuración y contexto por hecho
     Path("hechos/reclutamiento_niños/config.yaml"),
     Path("hechos/reclutamiento_niños/README.md"),
+    Path("hechos/reclutamiento_niños/notebooks/01_eda_casos.ipynb"),
+    Path("hechos/reclutamiento_niños/notebooks/02_eda_victimas.ipynb"),
     Path("hechos/violencia_sexual/config.yaml"),
     Path("hechos/violencia_sexual/README.md"),
+    Path("hechos/violencia_sexual/notebooks/01_eda_casos.ipynb"),
+    Path("hechos/violencia_sexual/notebooks/02_eda_victimas.ipynb"),
     
     # Scripts del pipeline
     Path("scripts/01_extraer_api.py"),
