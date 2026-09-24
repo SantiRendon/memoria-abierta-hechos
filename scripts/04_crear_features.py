@@ -83,7 +83,9 @@ def main():
     carpeta_features = Path(f"hechos/{hecho}/data/features")
     carpeta_features.mkdir(parents=True, exist_ok=True)
 
-    ruta_procesado = carpeta_processed / f"{hecho}_unificado.csv"
+    ruta_procesado = carpeta_processed / f"{hecho}_consolidado.csv"
+    if not ruta_procesado.exists():
+        ruta_procesado = carpeta_processed / f"{hecho}_unificado.csv"
     ruta_features = carpeta_features / f"features_{hecho}.csv"
 
     construir_features(ruta_procesado, ruta_features)

@@ -27,17 +27,17 @@ Este documento detalla la arquitectura operativa del pipeline, describiendo las 
                 [ 02_validar_estructura.py ]
              (Valida esquema, nulos, consistencia)
                                 │
-                                ▼
+                                 ▼
              [ 02_1_validar_integridad.py ]
         (Auditoría PK-FK, huérfanos y total_de_v_ctimas)
                                 │
                                 ▼
-                    [ 03_unificar_datos.py ]
-           (Une casos y víctimas por id_caso + DANE)
+                    [ 03_consolidar_datos.py ]
+          (Cruce relacional, normalización DANE y GeoJSON)
                                 │
                                 ▼
-                   hechos/{h}/data/processed/
-                         hechos_unificados.csv
+                 hechos/{h}/data/processed/{csv,json}/
+                       {h}_consolidado.{csv,json}
                                 │
               ┌─────────────────┴─────────────────┐
               ▼                                   ▼
@@ -104,17 +104,24 @@ Este documento detalla la arquitectura operativa del pipeline, describiendo las 
 
 ---
 
-### Script `03_unificar_datos.py`
-- **Propósito:** Realizar el cruce relacional entre el nivel agregado (Casos) y el nivel desagregado (Víctimas).
+### Script `03_consolidar_datos.py`
+- **Propósito:** Limpiar, homogeneizar y consolidar en una tabla analítica unificada a nivel de víctima los registros de Casos y Víctimas, integrando variables contextuales del evento.
 - **Entrada:**
-  - `casos_raw.csv` y `victimas_raw.csv`.
+  - Parámetro `--hecho` (`reclutamiento_niños`, `violencia_sexual`).
+  - Parámetro `--formato-entrada` (`auto`, `json`, `csv`): permite escoger procesar los crudos CSV o JSON.
+  - Parámetro `--fecha`: snapshot específico (opcional).
 - **Procesamiento:**
-  - Estandarización de códigos DANE a 5 dígitos (2 departamento + 3 municipio).
-  - Normalización de nombres de municipios y departamentos (mayúsculas, tildes).
-  - `merge` / unión relacional a través de `id_caso`.
-  - Imputación o marcado de valores faltantes conocidos.
+  - Filtrado de columnas de metadatos Socrata (`:id`, `:created_at`, etc.).
+  - Normalización de llaves `id_caso` e `id_persona` (sin decimales ni espacios).
+  - Estandarización de códigos DANE a 5 dígitos (`zfill(5)`).
+  - Extracción de coordenadas numéricas (`latitud`, `longitud`) a partir de geometrías GeoJSON Point.
+  - Merge relacional `left` por `id_caso` sin colisión de columnas transversales.
+  - Trazabilidad con `hecho_victimizante` y `fecha_consolidacion`.
 - **Salida:**
-  - `hechos/{hecho}/data/processed/datos_unificados.csv`
+  - Parámetro `--formato-salida` (`csv`, `json`, `ambos`).
+  - `hechos/{hecho}/data/processed/csv/{hecho}_consolidado_{fecha}.csv`
+  - `hechos/{hecho}/data/processed/json/{hecho}_consolidado_{fecha}.json`
+  - Enlaces directos canónicos: `hechos/{hecho}/data/processed/{hecho}_consolidado.{csv,json}`
 
 ---
 

@@ -22,22 +22,25 @@ htmlcov/
 .ipynb_checkpoints/
 *-checkpoint.ipynb
 
-# Datos crudos, intermedios y de features (evitar subir datos masivos o sensibles)
-hechos/*/data/raw/**/*.csv
-hechos/*/data/raw/**/*.json
-hechos/*/data/raw/*.csv
-hechos/*/data/raw/*.json
-hechos/*/data/raw/json/
-hechos/*/data/raw/csv/
-hechos/*/data/processed/*.csv
-hechos/*/data/processed/*.parquet
-hechos/*/data/features/*.csv
-hechos/*/data/features/*.parquet
+# Datos crudos, procesados y de features (evitar subir datos masivos o sensibles)
+hechos/*/data/raw/
+hechos/*/data/raw/**
+hechos/*/data/processed/
+hechos/*/data/processed/**
+hechos/*/data/features/
+hechos/*/data/features/**
+data/raw/
+data/processed/
+data/features/
+
+# Extensiones de datos masivos
 *.csv
 *.parquet
 
 # Excepciones: conservar estructura con .gitkeep si aplica
 !hechos/**/.gitkeep
+!hechos/**/data/**/.gitkeep
+!**/.gitkeep
 
 # Modelos entrenados y checkpoints
 hechos/*/modelos/*.pkl

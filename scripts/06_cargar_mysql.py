@@ -118,7 +118,9 @@ def main():
     print("=" * 70)
 
     carpeta_processed = Path(f"hechos/{hecho}/data/processed")
-    ruta_procesado = carpeta_processed / f"{hecho}_unificado.csv"
+    ruta_procesado = carpeta_processed / f"{hecho}_consolidado.csv"
+    if not ruta_procesado.exists():
+        ruta_procesado = carpeta_processed / f"{hecho}_unificado.csv"
 
     cargar_a_mysql(ruta_procesado, hecho)
 
